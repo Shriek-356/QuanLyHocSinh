@@ -6,12 +6,10 @@ from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from sqlalchemy import Enum
 
-
 class GioiTinh(PyEnum):
     NAM = "Nam"
     NU = "Nữ"
     KHAC = "Khác"
-
 
 class TaiKhoan(db.Model):
     __tablename__ = 'TAIKHOAN'
@@ -40,8 +38,6 @@ class Admin (db.Model):
     def __str__(self):
         return self.TenNhanVien
 
-
-
 class NhanVienTruong(db.Model):
     __tablename__ = 'NHANVIENTRUONG'
     MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
@@ -57,6 +53,7 @@ class MonHoc(db.Model):
     __tablename__ = 'MONHOC'
     MaMonHoc = Column(Integer, primary_key=True, autoincrement=True)
     TenMonHoc = Column(String(20), nullable=False)
+    ThoiLuongHoc = Column(Integer, nullable=False)
 
     giaoviens = relationship('GiaoVien', backref='monhoc', lazy=True)
 
@@ -158,5 +155,5 @@ ChiTietDiem = db.Table('ChiTietDiem',
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Tạo bảng trong cơ sở dữ liệu
+        db.create_all()
     app.run(debug=True)
