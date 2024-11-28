@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from sqlalchemy import Enum
+from flask_login import UserMixin
 
 class GioiTinh(PyEnum):
     NAM = "Nam"
@@ -17,7 +18,7 @@ class VaiTro(PyEnum):
     TEACHER ="Giáo Viên"
 
 
-class TaiKhoan(db.Model):
+class TaiKhoan(db.Model, UserMixin):
     __tablename__ = 'TAIKHOAN'
 
     MaTaiKhoan = Column(Integer, primary_key=True, autoincrement=True)
@@ -33,6 +34,9 @@ class TaiKhoan(db.Model):
 
     def __str__(self):
         return self.TenDangNhap
+
+    def get_id(self):
+        return str(self.MaTaiKhoan)
 
 
 class Admin (db.Model):
