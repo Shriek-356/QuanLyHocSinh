@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Học Sinh</title>
-    <link href="{{ url_for('static',filename='css/style.css') }}" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sinh viên</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
 </head>
 <body>
-<h1>XINCHAO</h1>
+    <div class="container">
+        <div class="header">
+            <h1>Chào mừng đến với trang Quản Lý Sinh Viên của trường abcxyz!</h1>
+            <p>Nhấn nút dưới đây để đăng nhập</p>
+        </div>
+        <div class="login-container">
+            <a href ="{{url_for('login')}}" class="login-button">Đăng Nhập</a>
+        </div>
+    </div>
 </body>
 </html>

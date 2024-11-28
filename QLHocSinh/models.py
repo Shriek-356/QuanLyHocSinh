@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Double
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Double,Date
 from QLHocSinh import db
 from QLHocSinh import app
 from datetime import datetime
@@ -11,6 +11,12 @@ class GioiTinh(PyEnum):
     NU = "Nữ"
     KHAC = "Khác"
 
+class VaiTro(PyEnum):
+    ADMIN="Admin"
+    STAFF="Nhân viên trường"
+    TEACHER ="Giáo Viên"
+
+
 class TaiKhoan(db.Model):
     __tablename__ = 'TAIKHOAN'
 
@@ -19,8 +25,8 @@ class TaiKhoan(db.Model):
     MatKhau = Column(String(20), nullable=False)
     NgayTao = Column(DateTime, default=datetime.now)
     CCCD = Column(String(9), nullable=False)
-    NgaySinh = Column(DateTime, default=datetime.now)
-    LoaiTaiKhoan = Column(String(15))
+    NgaySinh = Column(Date)
+    LoaiTaiKhoan = Column(Enum(VaiTro), default=VaiTro.STAFF, nullable=False)
 
     admin = relationship('Admin',backref='taikhoan', lazy=True)
     nhanvientruong = relationship('NhanVienTruong',backref='taikhoan', lazy=True)
@@ -34,6 +40,7 @@ class Admin (db.Model):
     MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     MaTaiKhoan = Column(Integer, ForeignKey(TaiKhoan.MaTaiKhoan), nullable=False)
     TenNhanVien = Column(String(20), nullable=False)
+    GioiTinh = Column(Enum(GioiTinh), nullable=False)
 
     def __str__(self):
         return self.TenNhanVien
@@ -76,7 +83,7 @@ class Lop(db.Model):
 
 class GiaoVien(db.Model):
     __tablename__ = 'GIAOVIEN'
-    MaGiaoVien = Column(Integer, primary_key=True, autoincrement=True)
+    MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc) ,nullable=False)
     TenGV = Column(String(20), nullable=False)
     DiaChi = Column(String(50))
@@ -137,7 +144,7 @@ class Diem(db.Model):
 
 ChiTietLopGV = db.Table('ChiTietLopGV',
                           Column('MaLop',Integer,ForeignKey(Lop.MaLop),nullable=False,primary_key=True),
-                          Column('MaGV',Integer,ForeignKey(GiaoVien.MaGiaoVien),nullable=False,primary_key=True),
+                          Column('MaGV',Integer,ForeignKey(GiaoVien.MaNhanVien),nullable=False,primary_key=True),
 )
 
 ChiTietLopHS = db.Table('ChiTietLopHS',
@@ -150,8 +157,6 @@ ChiTietDiem = db.Table('ChiTietDiem',
                           Column('MaHocSinh',Integer,ForeignKey(HocSinh.MaHocSinh),nullable=False,primary_key=True),
                           Column('MaMonHoc',Integer,ForeignKey(MonHoc.MaMonHoc),nullable=False,primary_key=True)
 )
-
-
 
 if __name__ == '__main__':
     with app.app_context():
