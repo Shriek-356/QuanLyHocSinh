@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Double,Date
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Double, Date, UniqueConstraint
 from QLHocSinh import db
 from QLHocSinh import app
 from datetime import datetime
@@ -31,6 +31,7 @@ class TaiKhoan(db.Model, UserMixin):
 
     admin = relationship('Admin',backref='taikhoan', lazy=True)
     nhanvientruong = relationship('NhanVienTruong',backref='taikhoan', lazy=True)
+    teacher = relationship('GiaoVien',backref='taikhoan', lazy=True)
 
     def __str__(self):
         return self.TenDangNhap
@@ -67,11 +68,12 @@ class MonHoc(db.Model):
     ThoiLuongHoc = Column(Integer, nullable=False)
 
     giaoviens = relationship('GiaoVien', backref='monhoc', lazy=True)
+    diem15p = relationship('Diem15p', backref='monhoc', lazy=True)
+    diem1tiet = relationship('Diem1Tiet', backref='monhoc', lazy=True)
+    diemhocky = relationship('DiemHocKy', backref='monhoc', lazy=True)
 
     def __str__(self):
         return self.TenMonHoc
-
-
 
 
 class Lop(db.Model):
@@ -89,13 +91,13 @@ class GiaoVien(db.Model):
     __tablename__ = 'GIAOVIEN'
     MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc) ,nullable=False)
+    MaTaiKhoan = Column(Integer, ForeignKey(TaiKhoan.MaTaiKhoan), nullable=False)
     TenGV = Column(String(20), nullable=False)
     DiaChi = Column(String(50))
     SoDienThoai = Column(String(10),nullable=False)
 
     def __str__(self):
         return self.TenGV
-
 
 
 class HocSinh(db.Model):
@@ -107,6 +109,9 @@ class HocSinh(db.Model):
     DiaChi = Column(String(50),nullable=False)
     SoDienThoai = Column(String(10),nullable=False)
     Email = Column(String(20), nullable=False)
+    diem15p=relationship('Diem15p',backref='hocsinh',lazy=True)
+    diem1tiet=relationship('Diem1Tiet',backref='hocsinh',lazy=True)
+    diemhocky=relationship('DiemHocKy',backref='hocsinh',lazy=True)
 
     def __str__(self):
         return self.HoTen
@@ -126,40 +131,60 @@ class HocKy(db.Model):
     MaHocKy = Column(Integer, primary_key=True, autoincrement=True)
     TenHocKy = Column(String(20), nullable=False)
     MaNamHoc = Column(Integer, ForeignKey(NamHoc.MaNamHoc) ,nullable=False)
+    diems_15p = relationship('Diem15p', backref='hocky', lazy=True)
+    diems_1tiet = relationship('Diem1Tiet', backref='hocky', lazy=True)
+    diems_hocky = relationship('DiemHocKy', backref='hocky', lazy=True)
+
 
     def __str__(self):
         return self.TenHocKy
 
-class Diem(db.Model):
-    __tablename__ = 'DIEM'
-    MaDiem = Column(Integer, primary_key=True, autoincrement=True)
+class Diem15p(db.Model):
+    __tablename__ = 'DIEM15P'
+    MaDiem15p = Column(Integer, primary_key=True, autoincrement=True)
+    MaHocSinh = Column(Integer, ForeignKey(HocSinh.MaHocSinh), nullable=False)
+    MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc), nullable=False)
+    SoDiem15p = Column(Double, nullable=False)
     MaHocKy = Column(Integer, ForeignKey(HocKy.MaHocKy), nullable=False)
-    MaNamHoc =Column(Integer,ForeignKey(NamHoc.MaNamHoc) ,nullable=False)
-    Diem15pCot1 = Column(Double, nullable=False)
-    Diem15pCot2 = Column(Double, nullable=True)
-    Diem15pCot3 = Column(Double, nullable=True)
-    Diem15pCot4 = Column(Double, nullable=True)
-    Diem15pCot5 = Column(Double, nullable=True)
-    Diem1TietCot1 = Column(Double, nullable=False)
-    Diem1TietCot2 = Column(Double, nullable=True)
-    Diem1TietCot3 = Column(Double, nullable=True)
-    DiemCuoiKy = Column(Double, nullable=False)
+    MaNamHoc = Column(Integer, ForeignKey(NamHoc.MaNamHoc), nullable=False)
 
+    def __str__(self):
+        return self.MaDiem15p
+
+class Diem1Tiet(db.Model):
+    __tablename__ = 'DIEM1TIET'
+    MaDiem1Tiet = Column(Integer, primary_key=True, autoincrement=True)
+    MaHocSinh = Column(Integer, ForeignKey(HocSinh.MaHocSinh), nullable=False)
+    MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc), nullable=False)
+    SoDiem1Tiet = Column(Double, nullable=False)
+    MaHocKy = Column(Integer, ForeignKey(HocKy.MaHocKy), nullable=False)
+    MaNamHoc = Column(Integer, ForeignKey(NamHoc.MaNamHoc), nullable=False)
+
+    def __str__(self):
+        return self.MaDiem1Tiet
+
+class DiemHocKy(db.Model):
+    __tablename__ = 'DIEMHOCKY'
+    MaDiemHocKy = Column(Integer, primary_key=True, autoincrement=True)
+    MaHocSinh = Column(Integer, ForeignKey(HocSinh.MaHocSinh), nullable=False)
+    MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc), nullable=False)
+    SoDiemHocKy = Column(Double, nullable=False)
+    MaHocKy = Column(Integer, ForeignKey(HocKy.MaHocKy), nullable=False)
+    MaNamHoc = Column(Integer, ForeignKey(NamHoc.MaNamHoc), nullable=False)
+
+    def __str__(self):
+        return self.MaDiemHocKy
 
 ChiTietLopGV = db.Table('ChiTietLopGV',
-                          Column('MaLop',Integer,ForeignKey(Lop.MaLop),nullable=False,primary_key=True),
-                          Column('MaGV',Integer,ForeignKey(GiaoVien.MaNhanVien),nullable=False,primary_key=True),
+                         Column('MaLop', Integer, ForeignKey(Lop.MaLop), nullable=False, primary_key=True),
+                         Column('MaGV', Integer, ForeignKey(GiaoVien.MaNhanVien), nullable=False, primary_key=True),
+                         UniqueConstraint('MaLop', 'MaGV', name='uix_lop_gv')  # Đảm bảo mỗi giáo viên chỉ dạy một lớp duy nhất
 )
 
 ChiTietLopHS = db.Table('ChiTietLopHS',
-                          Column('MaLop',Integer,ForeignKey(Lop.MaLop),nullable=False,primary_key=True),
-                          Column('MaHocSinh',Integer,ForeignKey(HocSinh.MaHocSinh),nullable=False,primary_key=True),
-)
-
-ChiTietDiem = db.Table('ChiTietDiem',
-                          Column('MaDiem',Integer,ForeignKey(Diem.MaDiem),nullable=False,primary_key=True),
-                          Column('MaHocSinh',Integer,ForeignKey(HocSinh.MaHocSinh),nullable=False,primary_key=True),
-                          Column('MaMonHoc',Integer,ForeignKey(MonHoc.MaMonHoc),nullable=False,primary_key=True)
+                         Column('MaLop', Integer, ForeignKey(Lop.MaLop), nullable=False, primary_key=True),
+                         Column('MaHocSinh', Integer, ForeignKey(HocSinh.MaHocSinh), nullable=False, primary_key=True),
+                         UniqueConstraint('MaLop', 'MaHocSinh', name='uix_lop_hs')  # Đảm bảo học sinh chỉ có mặt trong lớp một lần
 )
 
 if __name__ == '__main__':
