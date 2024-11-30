@@ -34,10 +34,17 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         return self.render('admin/index.html', stats=utils)
 
+class StatsView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/stats.html', stats=utils.tinh_diem_TB())
 
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.LoaiTaiKhoan.__eq__(VaiTro.ADMIN)
 
 admin = Admin(app, name ="Administration", template_mode = 'bootstrap4', index_view=MyAdminIndexView())
 admin.add_view(MonHoc_Details(MonHoc, db.session))
+admin.add_view(StatsView(name="Thống kê môn học"))
 admin.add_view(LogoutView(name='Đăng Xuất'))
 
 
