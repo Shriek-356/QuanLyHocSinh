@@ -7,19 +7,16 @@
 
     <table class="table">
         <tr>
-            <th>Lớp</th>
-            <th>Sĩ Số</th>
-            <th>Số lượng đạt</th>
-            <th>Tỉ lệ</th>
+            <th>HocSinh</th>
+            <th>Ma Lop </th>
+            <th>Diem TB</th>
         </tr>
         {% for s in stats %}
         <tr>
             <td>{{ s[0] }}</td>
             <td>{{ s[1] }}</td>
-            <td>{{ s[2] }}</td>
-            <td>{{ s[3] }}</td>
+            <td>{{ s[2] }} </td>
         </tr>
-
         {% endfor %}
     </table>
 

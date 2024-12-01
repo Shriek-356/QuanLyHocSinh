@@ -763,8 +763,7 @@ diem_hoc_ky_data = [
 
 if __name__ == '__main__':
     with app.app_context():
-        # Tạo bảng trong cơ sở dữ liệu
         db.create_all()
-        
+
         # Chạy ứng dụng Flask
         app.run(debug=True)
