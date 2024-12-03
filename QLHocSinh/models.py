@@ -67,7 +67,6 @@ class MonHoc(db.Model):
     TenMonHoc = Column(String(50), nullable=False)
     ThoiLuongHoc = Column(Integer, nullable=False)
 
-    giaoviens = relationship('GiaoVien', backref='monhoc', lazy=True)
     diem15p = relationship('Diem15p', backref='monhoc', lazy=True)
     diem1tiet = relationship('Diem1Tiet', backref='monhoc', lazy=True)
     diemhocky = relationship('DiemHocKy', backref='monhoc', lazy=True)
@@ -102,7 +101,6 @@ class Lop(db.Model):
 class GiaoVien(db.Model):
     __tablename__ = 'GIAOVIEN'
     MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
-    MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc, ondelete="CASCADE") ,nullable=False)
     MaTaiKhoan = Column(Integer, ForeignKey(TaiKhoan.MaTaiKhoan, ondelete="CASCADE"), nullable=False)
     TenNhanVien = Column(String(50), nullable=False)
     DiaChi = Column(String(255))
@@ -202,9 +200,9 @@ ChiTietLopHS = db.Table('ChiTietLopHS',
 )
 
 ChiTietMonHocGV = db.Table('ChiTietMonHocGV',
-    Column('MaGiaoVien', Integer, ForeignKey(GiaoVien.MaNhanVien,ondelete="CASCADE"), primary_key=True),
+    Column('MaNhanVien', Integer, ForeignKey(GiaoVien.MaNhanVien,ondelete="CASCADE"), primary_key=True),
     Column('MaMonHoc', Integer, ForeignKey(MonHoc.MaMonHoc,ondelete="CASCADE"), primary_key=True),
-    UniqueConstraint('MaGiaoVien', 'MaMonHoc', name='uix_gv_mh')
+    UniqueConstraint('MaNhanVien', 'MaMonHoc', name='uix_gv_mh')
 )
 
 

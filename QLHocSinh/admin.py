@@ -2,13 +2,14 @@ from ensurepip import bootstrap
 from pstats import Stats
 from QLHocSinh import *
 from flask_admin import Admin
-from QLHocSinh.models import MonHoc, VaiTro
+from QLHocSinh.models import MonHoc, VaiTro, CauHinhLopHoc
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, logout_user
 from flask_admin import BaseView,expose,AdminIndexView
-from flask import redirect, url_for
+from flask import redirect, url_for, flash
 import utils
 from QLHocSinh import db
+
 
 class AuthenticatedModelView(ModelView):
     def is_accessible(self):
@@ -29,6 +30,19 @@ class MonHoc_Details(AuthenticatedModelView):
     }
     column_searchable_list = ['TenMonHoc']
 
+    #Xử lý khi thay đổi môn học
+    def on_model_change(self, form, model, is_created):
+
+        if is_created:
+            flash(f'Môn học "{model.TenMonHoc}" đã được tạo mới thành công!', 'success')
+        else:
+            flash(f'Môn học "{model.TenMonHoc}" đã được thay đổi thành công!', 'success')
+
+
+    #Thông báo khi xóa xong
+    def after_model_delete(self, model):
+        flash(f'Môn học "{model.TenMonHoc}" đã bị xóa thành công!', 'danger')
+
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
@@ -44,9 +58,20 @@ class StatsView(BaseView):
         return current_user.is_authenticated and current_user.LoaiTaiKhoan.__eq__(VaiTro.ADMIN)
 
 
+class Regulations(AuthenticatedModelView):
+    column_labels = {
+        'SiSoToiDa': 'Sĩ số tối đa',
+        'DoTuoiToiThieu': 'Độ tuổi tối thiểu',
+        'DoTuoiToiDa':'Độ tuổi tối đa',
+        'NgayCapNhat':'Ngày cập nhật'
+    }
+    can_delete = False
+    can_create = False
+
 admin = Admin(app, name ="Administration", template_mode = 'bootstrap4', index_view=MyAdminIndexView())
-admin.add_view(MonHoc_Details(MonHoc, db.session))
+admin.add_view(MonHoc_Details(MonHoc, db.session,name ="Môn Học"))
 admin.add_view(StatsView(name="Thống kê môn học"))
+admin.add_view(Regulations(CauHinhLopHoc,db.session,name="Quy Định"))
 admin.add_view(LogoutView(name='Đăng Xuất'))
 
 
