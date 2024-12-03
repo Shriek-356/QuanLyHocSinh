@@ -1,7 +1,7 @@
 /* style.css */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: white;
     margin: 0;
     padding: 0;
 }
@@ -60,4 +60,45 @@ button.login-button {
 
 button.login-button:hover {
     background-color: #45a049;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f4f4f4;
+    height: 100%;
+}
+
+.containersidebarcontent {
+    display: flex;
+    height: 100vh;
+}
+
+.verticalsidebar {
+    width: 250px;
+    background-color: #0099FF	;
+    color: white;
+    padding: 20px;
+    height: 100%;
+}
+
+.verticalsidebar ul {
+    list-style-type: none;
+}
+
+.verticalsidebar ul li {
+    margin: 40px 0;
+    padding: 10px 20px;
+    text-align: left;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.verticalsidebar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.verticalsidebar ul li a:hover {
+    text-decoration: underline;
 }

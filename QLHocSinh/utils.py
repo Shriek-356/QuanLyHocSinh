@@ -5,14 +5,12 @@ from sqlalchemy import func, case, cast
 from QLHocSinh import db
 
 
-def check_login(username, password, role = VaiTro.ADMIN):
+
+def check_login(username, password):
     query = TaiKhoan.query.filter(
         TaiKhoan.TenDangNhap == username.strip(),
         TaiKhoan.MatKhau == password
     )
-    if role:
-        query = query.filter(TaiKhoan.LoaiTaiKhoan == role)
-
     return query.first()
 
 def get_user_by_id(user_id):
@@ -23,7 +21,6 @@ def tinh_diem_TB_hocsinh(monhocid=None, hockyid=None, namhocid=None):
     Diem15pAlias = aliased(Diem15p)
     Diem1TietAlias = aliased(Diem1Tiet)
     DiemHocKyAlias = aliased(DiemHocKy)
-
 
     subquery = db.session.query(
         HocSinh.MaHocSinh,
@@ -97,5 +94,13 @@ def laydanhsachhocsinh():
     return q
 
 def laymonhoc(monhocid=None):
-    return db.session.query(MonHoc.MaMonHoc,MonHoc.TenMonHoc).filter(MonHoc.MaMonHoc==monhocid).all();
+    return db.session.query(MonHoc.MaMonHoc,MonHoc.TenMonHoc).filter(MonHoc.MaMonHoc==monhocid).all()
+
+def laythongtinnhanvien(MaTaiKhoan, VaiTro):
+
+    if VaiTro==VaiTro.STAFF:
+        return NhanVienTruong.query.filter(MaTaiKhoan==NhanVienTruong.MaTaiKhoan).first()
+    elif VaiTro==VaiTro.TEACHER:
+        return GiaoVien.query.filter(MaTaiKhoan==GiaoVien.MaTaiKhoan).first()
+
 

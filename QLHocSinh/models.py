@@ -104,7 +104,7 @@ class GiaoVien(db.Model):
     MaNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     MaMonHoc = Column(Integer, ForeignKey(MonHoc.MaMonHoc, ondelete="CASCADE") ,nullable=False)
     MaTaiKhoan = Column(Integer, ForeignKey(TaiKhoan.MaTaiKhoan, ondelete="CASCADE"), nullable=False)
-    TenGV = Column(String(50), nullable=False)
+    TenNhanVien = Column(String(50), nullable=False)
     DiaChi = Column(String(255))
     SoDienThoai = Column(String(10),nullable=False)
 
