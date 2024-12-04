@@ -104,3 +104,34 @@ def laythongtinnhanvien(MaTaiKhoan, VaiTro):
         return GiaoVien.query.filter(MaTaiKhoan==GiaoVien.MaTaiKhoan).first()
 
 
+def laylopcuagiaovien(MaNhanVien):
+    query = db.session.query(Lop)\
+             .join(ChiTietLopGV, Lop.MaLop == ChiTietLopGV.c.MaLop)\
+             .filter(MaNhanVien == ChiTietLopGV.c.MaGV).all()
+    return query
+
+def laymonhoccuagiaovientheolop(MaNhanVien, MaLop):
+    query = db.session.query(MonHoc) \
+            .join(ChiTietLopGV, MonHoc.MaMonHoc == ChiTietLopGV.c.MaMonHoc) \
+            .filter(MaNhanVien == ChiTietLopGV.c.MaGV,
+                    MaLop == ChiTietLopGV.c.MaLop).all()
+    print(query)
+    return query
+
+def laynamhoccuagiaovien(MaNhanVien, MaLop):
+    query= db.session.query(NamHoc)\
+           .join(ChiTietLopGV, NamHoc.MaNamHoc == ChiTietLopGV.c.MaNamHoc) \
+           .filter(MaNhanVien == ChiTietLopGV.c.MaGV,
+            MaLop == ChiTietLopGV.c.MaLop,
+            ).all()
+
+    return query
+
+def layhocky(MaNhanVien, MaLop):
+    query = db.session.query(HocKy) \
+        .join(NamHoc, HocKy.MaNamHoc == NamHoc.MaNamHoc)\
+        .join(ChiTietLopGV, NamHoc.MaNamHoc == ChiTietLopGV.c.MaNamHoc) \
+        .filter(MaNhanVien == ChiTietLopGV.c.MaGV,
+                MaLop == ChiTietLopGV.c.MaLop,
+                ).all()
+    return query

@@ -1,10 +1,12 @@
+
 from QLHocSinh import app
 from flask import render_template, request, url_for,redirect
 from QLHocSinh.admin import *
 from QLHocSinh import utils,login
 from flask_login import login_user, logout_user
 from QLHocSinh.models import *
-from QLHocSinh.utils import laythongtinnhanvien
+from QLHocSinh.utils import laythongtinnhanvien, laylopcuagiaovien, laymonhoccuagiaovientheolop, laynamhoccuagiaovien, \
+    layhocky
 
 
 @app.route('/')
@@ -14,7 +16,7 @@ def welcome():
 
 @app.route('/home')
 def home():
-    userif=laythongtinnhanvien(current_user.MaTaiKhoan,current_user.LoaiTaiKhoan)
+    userif = laythongtinnhanvien(current_user.MaTaiKhoan,current_user.LoaiTaiKhoan)
 
     return render_template('home.html',VaiTro=VaiTro,userif=userif)
 
@@ -53,13 +55,24 @@ def login_admin():
     if user:
         login_user(user)
         return redirect(url_for('admin.index'))
-@app.route('/test1')
-def test1():
-    return render_template('test1.html')
+@app.route('/nhapdiem', methods=["GET", "POST"])
+def nhapdiem():
+    userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
+    lop = laylopcuagiaovien(userif.MaNhanVien)
+    mondangday = []
+    namdangday = []
+    hocky = []
+    if request.method == 'POST':
+        malopdaloc=request.form.get('malopdaloc')
+        mondangday = laymonhoccuagiaovientheolop(userif.MaNhanVien,malopdaloc) #Lay mon dang day
+        namdangday = laynamhoccuagiaovien(userif.MaNhanVien,malopdaloc)
+        hocky = layhocky(userif.MaNhanVien,malopdaloc)
+    return render_template('nhapdiem.html',userif=userif,VaiTro=VaiTro, lop=lop,mondangday=mondangday,namdangday=namdangday,hocky=hocky)
 
 @app.route('/test2')
 def test2():
-    return render_template('test2.html')
+    userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
+    return render_template('test2.html',userif=userif,VaiTro=VaiTro)
 
 
 

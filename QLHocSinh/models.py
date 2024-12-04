@@ -190,12 +190,14 @@ class DiemHocKy(db.Model):
 ChiTietLopGV = db.Table('ChiTietLopGV',
                          Column('MaLop', Integer, ForeignKey(Lop.MaLop,ondelete="CASCADE"), nullable=False, primary_key=True),
                          Column('MaGV', Integer, ForeignKey(GiaoVien.MaNhanVien,ondelete="CASCADE"), nullable=False, primary_key=True),
-                         UniqueConstraint('MaLop', 'MaGV', name='uix_lop_gv')
+                         Column('MaNamHoc', Integer, ForeignKey(NamHoc.MaNamHoc), nullable=False),
+                         Column('MaMonHoc', Integer, ForeignKey(MonHoc.MaMonHoc,ondelete="CASCADE"), nullable=False,primary_key=True),
 )
 
 ChiTietLopHS = db.Table('ChiTietLopHS',
                          Column('MaLop', Integer, ForeignKey(Lop.MaLop), nullable=False, primary_key=True),
                          Column('MaHocSinh', Integer, ForeignKey(HocSinh.MaHocSinh), nullable=False, primary_key=True),
+                         Column('MaNamHoc', Integer, ForeignKey(NamHoc.MaNamHoc), nullable=False),
                          UniqueConstraint('MaLop', 'MaHocSinh', name='uix_lop_hs')
 )
 

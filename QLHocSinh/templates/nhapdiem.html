@@ -1,0 +1,65 @@
+{% extends 'home.html' %}
+
+{% block func %}
+<div class="contentt">
+<h1 class="titlecontent" style="font-size: 40px;margin-left: 300px; color:#FF0000 "> Danh sách học sinh và điểm số </h1>
+         <form method="POST" style="text-align: center;">
+
+        <!-- Phần lọc lớp -->
+        <div class="filter-class">
+            <div>
+                <label for="lopdaloc">Chọn lớp:</label><br>
+                <select id="lopdaloc" name="malopdaloc">
+                    {% for l in lop %}
+                        <option value="{{ l.MaLop }}">{{ l.TenLop }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <button type="submit" name="filter_class" style="padding: 10px 20px; margin-top: 2px;">Lọc lớp</button>
+            </div>
+        </div>
+ </form>
+        <br><br>
+    <form method="POST" style="text-align: center;">
+        <!-- Phần lọc môn học, năm học và học kì -->
+        <div class="filter-sub">
+            <div>
+                <label for="monhoc">Chọn môn học:</label><br>
+                <select id="monhoc" name="monhoc">
+                    {% if mondangday %}
+                        {% for mon in mondangday %}
+                            <option value="{{ mon }}">{{ mon }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Chưa được phân công dạy môn nào</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div>
+                <label for="namhoc">Chọn năm học:</label><br>
+                <select id="namhoc" name="namhoc">
+                    {% for nam in namdangday %}
+                        <option value="{{ nam.MaNamHoc }}">{{ nam.TenNamHoc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="hocky">Chọn học kì:</label><br>
+                <select id="hocky" name="hocky">
+                    {% for hk in hocky %}
+                        <option value="{{ hk.MaHocKy }}">{{ hk.MaHocKy }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" name="filter_details" style="padding: 10px 20px; margin-top: 2px;">Xác nhận</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
