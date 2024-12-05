@@ -115,7 +115,6 @@ def laymonhoccuagiaovientheolop(MaNhanVien, MaLop):
             .join(ChiTietLopGV, MonHoc.MaMonHoc == ChiTietLopGV.c.MaMonHoc) \
             .filter(MaNhanVien == ChiTietLopGV.c.MaGV,
                     MaLop == ChiTietLopGV.c.MaLop).all()
-    print(query)
     return query
 
 def laynamhoccuagiaovien(MaNhanVien, MaLop):
@@ -134,4 +133,14 @@ def layhocky(MaNhanVien, MaLop):
         .filter(MaNhanVien == ChiTietLopGV.c.MaGV,
                 MaLop == ChiTietLopGV.c.MaLop,
                 ).all()
+    return query
+
+def laydanhsachdiemhocsinh(MaLop,MaNamHoc):
+
+    query = db.session.query(HocSinh)\
+    .join(ChiTietLopHS, HocSinh.MaHocSinh == ChiTietLopHS.c.MaHocSinh)\
+    .filter(ChiTietLopHS.c.MaLop == MaLop,
+            ChiTietLopHS.c.MaNamHoc == MaNamHoc
+            ).all()
+
     return query

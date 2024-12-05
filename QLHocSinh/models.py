@@ -145,7 +145,6 @@ class HocKy(db.Model):
     diems_1tiet = relationship('Diem1Tiet', backref='hocky', lazy=True)
     diems_hocky = relationship('DiemHocKy', backref='hocky', lazy=True)
 
-
     def __str__(self):
         return self.TenHocKy
 

@@ -2,7 +2,7 @@
 
 {% block body %}
 
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated and current_user.LoaiTaiKhoan == VaiTro.ADMIN %}
 <h1>Chao Mung {{current_user.TenDangNhap}} toi trang Adminstrator</h1>
 {% else %}
 

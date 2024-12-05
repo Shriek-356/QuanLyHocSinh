@@ -46,7 +46,7 @@ class MonHoc_Details(AuthenticatedModelView):
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):
-        return self.render('admin/index.html', stats=utils)
+        return self.render('admin/index.html', VaiTro=VaiTro)
 
 
 class StatsView(BaseView):
