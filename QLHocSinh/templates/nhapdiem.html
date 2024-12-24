@@ -2,115 +2,188 @@
 
 {% block func %}
 <div class="contentt">
-<h1 class="titlecontent" style="font-size: 40px;margin-left: 300px; color:#FF0000 "> Danh sách học sinh và điểm số </h1>
+    <h1 class="titlecontent" style="font-size: 40px;margin-left: 300px; color:#FF0000 "> Danh sách học sinh và điểm số </h1>
+
+    <!-- Form lọc lớp -->
     <form method="POST" style="text-align: center;">
-    <div class="filter-class">
-    <div>
-        <label for="lopdaloc">Chọn lớp:</label><br>
-        <select id="lopdaloc" name="malopdaloc">
-            {% for l in lop %}
-                <option value="{{ l.MaLop }}"
-                        {% if l.MaLop|string == malopdachon|string %} selected {% endif %}>
-                    {{ l.TenLop }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-    <div>
-        <button type="submit" name="filter_class" style="padding: 10px 20px; margin-top: 2px;">Lọc lớp</button>
-    </div>
-</div>
-</form>
-        <br><br>
-    <form method="POST" style="text-align: center;">
-    <div class="filter-sub">
-        <div>
-            <label for="monhoc">Chọn môn học:</label><br>
-            <select id="monhoc" name="monhoc">
-                {% if mondangday %}
-                    {% for mon in mondangday %}
-                        <option value="{{ mon.MaMonHoc }}"
-                                {% if mon.MaMonHoc == mondachon%} selected {% endif %}>
-                            {{ mon.TenMonHoc }}
+        <div class="filter-class">
+            <div>
+                <label for="lopdaloc">Chọn lớp:</label><br>
+                <select id="lopdaloc" name="malopdaloc">
+                    {% for l in lop %}
+                        <option value="{{ l.MaLop }}" {% if l.MaLop|string == malopdachon|string %} selected {% endif %}>
+                            {{ l.TenLop }}
                         </option>
                     {% endfor %}
-                {% else %}
-                    <option value="">Chưa được phân công dạy môn nào</option>
-                {% endif %}
-            </select>
+                </select>
+            </div>
+            <div>
+                <button type="submit" name="filter_class" style="padding: 10px 20px; margin-top: 2px;">Lọc lớp</button>
+            </div>
         </div>
+    </form>
 
-        <div>
-            <label for="namhoc">Chọn năm học:</label><br>
-            <select id="namhoc" name="namhoc">
-                {% for nam in namdangday %}
-                    <option value="{{ nam.MaNamHoc }}"
-                            {% if nam.MaNamHoc|string == namdachon|string %} selected {% endif %}>
-                        {{ nam.TenNamHoc }}
-                    </option>
-                {% endfor %}
-            </select>
+    <br><br>
+
+    <!-- Form lọc chi tiết -->
+    <form method="POST" style="text-align: center;">
+        <div class="filter-sub">
+            <div>
+                <label for="monhoc">Chọn môn học:</label><br>
+                <select id="monhoc" name="monhoc">
+                    {% if mondangday %}
+                        {% for mon in mondangday %}
+                            <option value="{{ mon.MaMonHoc }}" {% if mon.MaMonHoc == mondachon%} selected {% endif %}>
+                                {{ mon.TenMonHoc }}
+                            </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Chưa được phân công dạy môn nào</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div>
+                <label for="namhoc">Chọn năm học:</label><br>
+                <select id="namhoc" name="namhoc">
+                    {% for nam in namdangday %}
+                        <option value="{{ nam.MaNamHoc }}" {% if nam.MaNamHoc|string == namdachon|string %} selected {% endif %}>
+                            {{ nam.TenNamHoc }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="hocky">Chọn học kì:</label><br>
+                <select id="hocky" name="hocky">
+                    {% for hk in hocky %}
+                        <option value="{{ hk.MaHocKy }}" {% if hk.MaHocKy|string == hockydachon|string %} selected {% endif %}>
+                            {{ hk.TenHocKy }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" name="filter_details" style="padding: 10px 20px; margin-top: 2px;">Xác nhận</button>
+            </div>
         </div>
+    </form>
 
-        <div>
-            <label for="hocky">Chọn học kì:</label><br>
-            <select id="hocky" name="hocky">
-                {% for hk in hocky %}
-                    <option value="{{ hk.MaHocKy }}"
-                            {% if hk.MaHocKy|string == hockydachon|string %} selected {% endif %}>
-                        {{ hk.TenHocKy }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="submit-container">
-            <button type="submit" name="filter_details" style="padding: 10px 20px; margin-top: 2px;">Xác nhận</button>
-        </div>
-    </div>
-</form>
-
- <!-- phần này là danh sách học sinh khi lọc -->
-
+    <!-- Phần danh sách học sinh khi lọc -->
     <div class="student-list" style="text-align: center;">
-    {% if danhsachhocsinh %}
-    <table class="table table-bordered" style="margin: 20px auto; width: 90%; text-align: center;">
-        <thead>
-            <tr>
-                <th>Họ tên</th>
-                <th>Điểm 15p</th>
-                <th>Điểm 1 Tiết</th>
-                <th>Điểm Học Kỳ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for hocsinh in danhsachhocsinh %}
-            <tr>
-                <td>{{ hocsinh.HoTen }}</td>
-                <td>
-                    {% for diem in hocsinh.diem15p_list %}
-                        <p>{{ diem.SoDiem15p }}</p>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for diem in hocsinh.diem1tiet_list %}
-                        <p>{{ diem.SoDiem1Tiet }}</p>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for diem in hocsinh.diemhocky_list %}
-                        <p>{{ diem.SoDiemHocKy }}</p>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Không có dữ liệu học sinh phù hợp với tiêu chí lọc.</p>
-    {% endif %}
-</div>
 
+        {% if danhsachhocsinh %}
+            <form method="POST" action="{{ url_for('nhapdiem') }}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Học Sinh</th>
+                            <th>Điểm 15p 1</th>
+                            <th>Điểm 15p 2</th>
+                            <th>Điểm 15p 3</th>
+                            <th>Điểm 15p 4</th>
+                            <th>Điểm 15p 5</th>
+                            <th>Điểm 1 Tiết 1</th>
+                            <th>Điểm 1 Tiết 2</th>
+                            <th>Điểm 1 Tiết 3</th>
+                            <th>Điểm Học Kỳ</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hocsinh in danhsachhocsinh %}
+                        <tr>
+                            <td>{{ hocsinh.HoTen }}</td>
 
+                            <!-- Điểm 15 phút -->
+                            {% for i in range(5) %}
+                            <td>
+                                <input type="number" name="diem15p_{{ hocsinh.MaHocSinh }}_{{ i }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diem15p_list[i].SoDiem15p if hocsinh.diem15p_list[i] else '' }}">
+                            </td>
+                            {% endfor %}
+
+                            <!-- Điểm 1 Tiết -->
+                            {% for i in range(3) %}
+                            <td>
+                                <input type="number" name="diem1tiet_{{ hocsinh.MaHocSinh }}_{{ i }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diem1tiet_list[i].SoDiem1Tiet if hocsinh.diem1tiet_list[i] else '' }}">
+                            </td>
+                            {% endfor %}
+
+                            <td>
+                                <input type="number" name="diemhocky_{{ hocsinh.MaHocSinh }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diemhocky_list[0].SoDiemHocKy if hocsinh.diemhocky_list else '' }}">
+                            </td>
+
+                            <td>
+                                <!-- Button cập nhật điểm, CSS đã được thay đổi để nhỏ gọn -->
+                                <button type="submit" name="update_scores" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-save"></i> Cập nhật
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        {% else %}
+            <p>Không có dữ liệu học sinh phù hợp với tiêu chí lọc.</p>
+        {% endif %}
+    </div>
+
+    <!-- Phần phân trang -->
+    <ul class="pagination">
+        {% for idx in range(1,pages + 1) %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('nhapdiem', page=idx) }}">{{ idx }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <!-- Nhúng CSS trực tiếp trong HTML -->
+    <style>
+        /* Điều chỉnh kích thước của các input chứa điểm */
+        .table input[type="number"] {
+            margin-top: 20px;
+            width: 60px; /* Giảm chiều rộng của input */
+            padding: 5px; /* Giảm padding cho input */
+            font-size: 18px; /* Giảm kích thước chữ trong input */
+            text-align: center; /* Căn giữa nội dung trong input */
+        }
+
+        /* Điều chỉnh kích thước của các button */
+        .btn-sm {
+            padding: 5px 10px; /* Giảm padding để button nhỏ hơn */
+            font-size: 18px; /* Giảm kích thước chữ cho button */
+            border-radius: 4px; /* Tạo viền mềm mại cho button */
+        }
+
+        /* Khi hover trên button */
+        .table button:hover {
+            background-color: #0056b3;  /* Màu nền khi hover */
+        }
+
+        /* Khi button được focus */
+        .table button:focus {
+            outline: none;  /* Bỏ viền focus */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);  /* Tạo bóng khi focus */
+        }
+
+        /* Phân trang */
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            border-radius: 50%;
+            padding: 8px 12px;
+        }
+    </style>
 </div>
 {% endblock %}

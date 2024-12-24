@@ -14,8 +14,7 @@
                 <li><a href="#">Chức năng 3</a></li>
               {% elif current_user.LoaiTaiKhoan == VaiTro.TEACHER %}
                 <li><a href="{{url_for('nhapdiem')}}">Nhập điểm cho học sinh</a></li>
-                <li><a href="{{url_for('test2')}}">Xuất điểm trung bình</a></li>
-                <li><a href="#">Chức năng 6</a></li>
+                <li><a href="{{url_for('xuatdiemtb')}}">Xuất điểm trung bình</a></li>
                {% endif %}
             </ul>
         </div>

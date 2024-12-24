@@ -1,23 +1,106 @@
 {% extends 'admin/base.html' %}
 
 {% block body %}
+ <style>
+        /* Toàn bộ trang */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Tiêu đề của trang */
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        /* Bảng */
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Định dạng cho các tiêu đề cột */
+        th {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Định dạng cho các ô trong bảng */
+        td {
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Định dạng cho các dòng khi hover */
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Cột Tỷ lệ (%) */
+        .percentage {
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        /* Cột Số học sinh đạt >= 5 */
+        .achieved {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        /* Cột Tổng số học sinh */
+        .total {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Định dạng khi bảng không có dữ liệu */
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
 <h1 class="text-center text-danger">Báo cáo tổng kết môn học</h1>
 
 <div class = "col-md-5 col-xs-12">
 
-    <table class="table">
-        <tr>
-            <th>HocSinh</th>
-            <th>Ma Lop </th>
-            <th>Diem TB</th>
-        </tr>
-        {% for s in stats %}
-        <tr>
-            <td>{{ s[0] }}</td>
-            <td>{{ s[1] }}</td>
-            <td>{{ s[2] }} </td>
-        </tr>
-        {% endfor %}
+     <table border="1" style=" width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <thead>
+            <tr>
+                <th>Lớp</th>
+                <th>Tổng số học sinh</th>  <!-- Cột mới -->
+                <th>Số học sinh đạt >= 5</th>
+                <th>Tỷ lệ (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lop, data in stats.items() %}
+                <tr>
+                    <td>{{ lop }}</td>
+                    <td>{{ data['tong_hocsinh'] }}</td>  <!-- Hiển thị tổng số học sinh -->
+                    <td>{{ data['so_hocsinh_dat'] }}</td>
+                    <td>{{ data['ty_le'] }}%</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
 </div>

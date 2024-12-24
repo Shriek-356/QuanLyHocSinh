@@ -1,0 +1,97 @@
+{% extends 'home.html' %}
+
+{% block func %}
+<div class="contentt">
+    <h1 class="titlecontent" style="font-size: 40px;margin-left: 100px; color:#FF0000">Danh sách học sinh và điểm trung bình</h1>
+    <form method="POST" style="text-align: center;">
+        <!-- Form lọc lớp -->
+        <div class="filter-classtb">
+            <label for="lopdaloc">Chọn lớp:</label><br>
+            <select id="lopdaloc" name="malopdaloctb">
+                {% for l in lop %}
+                    <option value="{{ l.MaLop }}" {% if l.MaLop|string == malopdachontb|string %} selected {% endif %}>
+                        {{ l.TenLop }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="filter_classtb" style="padding: 5px 10px; margin-top: 2px;">Lọc lớp</button>
+        </div>
+    </form>
+
+    <p style="font-size: 15px; text-align: center; color: orangered">Hãy nhớ lọc lớp trước rồi mới tìm môn và năm học liên quan</p>
+
+    <br><br>
+
+    <form method="POST" style="text-align: center;">
+        <div class="filter-sub">
+            <div>
+                <label for="monhoc">Chọn môn học:</label><br>
+                <select id="monhoc" name="monhoctb">
+                    {% if mondangdaytb %}
+                        {% for mon in mondangdaytb %}
+                            <option value="{{ mon.MaMonHoc }}" {% if mon.MaMonHoc|string == mondachontb|string %} selected {% endif %}>
+                                {{ mon.TenMonHoc }}
+                            </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Chưa được phân công dạy môn nào</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div>
+                <label for="namhoc">Chọn năm học:</label><br>
+                <select id="namhoc" name="namhoctb">
+                    {% for nam in namdangdaytb %}
+                        <option value="{{ nam.MaNamHoc }}" {% if nam.MaNamHoc|string == namdachontb|string %} selected {% endif %}>
+                            {{ nam.TenNamHoc }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" name="filter_detailstb" style="padding: 5px 10px; margin-top: 2px;">Xác nhận</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- phần này là bảng điểm học sinh sau khi lọc -->
+    <div class="student-list" style="text-align: center;">
+        {% if danhsachhocsinh %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Học Sinh</th>
+                        {% for hocky in hockys %}
+                            <th>Điểm Trung Bình {{ hocky.TenHocKy }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hocsinh in danhsachhocsinh %}
+                    <tr>
+                        <td>{{ hocsinh.HoTen }}</td>
+
+                        <!-- Lặp qua các học kỳ và hiển thị điểm trung bình tương ứng -->
+                        {% for diem in hocsinh.diemtb_list %}
+                            <td>
+                                {{ diem if diem is not none else 'Chưa có điểm' }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Không có dữ liệu học sinh phù hợp với tiêu chí lọc.</p>
+        {% endif %}
+    </div>
+    <!-- Phần phân trang -->
+    <ul class="pagination">
+        {% for idx in range(1,pages + 1) %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('xuatdiemtb', page=idx) }}">{{ idx }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

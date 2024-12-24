@@ -52,7 +52,7 @@ class MyAdminIndexView(AdminIndexView):
 class StatsView(BaseView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html', stats=utils.tinh_so_hs_diem_TB_lon_hon_5(1,2,1))
+        return self.render('admin/stats.html', stats=utils.dem_hocsinh_tutrungbinh_theolop(1,2,2))
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.LoaiTaiKhoan.__eq__(VaiTro.ADMIN)

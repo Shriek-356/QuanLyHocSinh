@@ -1,0 +1,66 @@
+{% extends 'nhapdiem.html' %}
+
+ {% block suadiem %}
+
+<div class="student-list" style="text-align: center;">
+
+        {% if danhsachhocsinh %}
+            <form method="POST" action="{{ url_for('nhapdiem') }}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Học Sinh</th>
+                            <th>Điểm 15p 1</th>
+                            <th>Điểm 15p 2</th>
+                            <th>Điểm 15p 3</th>
+                            <th>Điểm 15p 4</th>
+                            <th>Điểm 15p 5</th>
+                            <th>Điểm 1 Tiết 1</th>
+                            <th>Điểm 1 Tiết 2</th>
+                            <th>Điểm 1 Tiết 3</th>
+                            <th>Điểm Học Kỳ</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hocsinh in danhsachhocsinh %}
+                        <tr>
+                            <td>{{ hocsinh.HoTen }}</td>
+
+                            <!-- Điểm 15 phút -->
+                            {% for i in range(5) %}
+                            <td>
+                                <input type="number" name="diem15p_{{ hocsinh.MaHocSinh }}_{{ i }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diem15p_list[i].SoDiem15p if hocsinh.diem15p_list[i] else '' }}">
+                            </td>
+                            {% endfor %}
+
+                            <!-- Điểm 1 Tiết -->
+                            {% for i in range(3) %}
+                            <td>
+                                <input type="number" name="diem1tiet_{{ hocsinh.MaHocSinh }}_{{ i }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diem1tiet_list[i].SoDiem1Tiet if hocsinh.diem1tiet_list[i] else '' }}">
+                            </td>
+                            {% endfor %}
+
+                            <td>
+                                <input type="number" name="diemhocky_{{ hocsinh.MaHocSinh }}" step="any" min="0" max="10"
+                                       value="{{ hocsinh.diemhocky_list[0].SoDiemHocKy if hocsinh.diemhocky_list else '' }}">
+                            </td>
+
+                            <td>
+                                <button type="submit" name="update_scores" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Cập nhật
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        {% else %}
+            <p>Không có dữ liệu học sinh phù hợp với tiêu chí lọc.</p>
+        {% endif %}
+    </div>
+
+{% endblock %}

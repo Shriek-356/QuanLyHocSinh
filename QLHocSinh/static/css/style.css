@@ -175,3 +175,37 @@ button {
     margin-top: 10px;
 }
 
+
+/* Giảm kích thước input */
+input[type="number"] {
+    margin-top: 18px;
+    width: 60px; /* Chiều rộng nhỏ hơn */
+    padding: 5px; /* Giảm padding để ô nhập nhỏ hơn */
+    font-size: 14px; /* Font nhỏ lại */
+    text-align: center; /* Căn giữa nội dung trong input */
+}
+
+/* Giảm kích thước cho các button */
+button[type="submit"] {
+    padding: 5px 15px; /* Giảm padding */
+    font-size: 14px; /* Giảm kích thước font */
+    border-radius: 5px; /* Bo tròn góc */
+}
+
+/* Căn giữa các nút và các ô nhập */
+.student-list table {
+    margin: 0 auto; /* Căn giữa bảng */
+}
+
+/* Điều chỉnh kích thước của các thẻ <select> */
+select {
+    width: 120px; /* Chiều rộng nhỏ hơn cho các select */
+    padding: 5px;
+    font-size: 14px;
+}
+
+/* Giảm kích thước cho các thẻ <label> */
+label {
+    font-size: 14px; /* Giảm kích thước font cho label */
+}
+
