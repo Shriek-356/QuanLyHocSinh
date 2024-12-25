@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+Danh sách Lớp và Học sinh
+{% endblock %}
+
+{% block content %}
+<div class="containersidebarcontent">
+    <div class="verticalsidebar">
+        <ul>
+            {% if current_user.LoaiTaiKhoan == VaiTro.STAFF %}
+            <li><a href="{{ url_for('danhsach_lop') }}">TIẾP NHẬN HỌC SINH</a></li>
+            <li><a href="{{ url_for('hienthi_danhsach_lop_hocsinh') }}">LẬP DANH SÁCH LỚP</a></li>
+            {% elif current_user.LoaiTaiKhoan == VaiTro.TEACHER %}
+            <li><a href="#">NHẬP ĐIỂM</a></li>
+            <li><a href="#">XUẤT ĐIỂM</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="contentt">
+
+        <a href="{{ url_for('them_hocsinh') }}" class="btn-add-student">Thêm học sinh</a>
+
+        <form method="GET" action="{{ url_for('danhsach_lop') }}" onsubmit="return validateSearchForm()">
+            <label for="search_name">Tìm kiếm học sinh theo tên:</label>
+            <input type="text" id="search_name" name="search_name" value="{{ search_name }}" required title="Vui lòng điền thông tin tìm kiếm">
+
+            <button type="submit">Tìm kiếm</button>
+        </form>
+
+        <h2>Danh sách học sinh</h2>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Số thứ tự</th>
+                    <th>Họ Tên Học Sinh</th>
+                    <th>Giới Tính</th>
+                    <th>Ngày Sinh</th>
+                    <th>Địa Chỉ</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hoc_sinh, gioi_tinh, ngay_sinh, dia_chi, so_dien_thoai, email in danhsach_lop_hocsinh %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ hoc_sinh }}</td>
+                    <td>{{ gioi_tinh }}</td>
+                    <td>{{ ngay_sinh }}</td>
+                    <td>{{ dia_chi }}</td>
+                    <td>{{ so_dien_thoai }}</td>
+                    <td>{{ email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('home') }}">Quay lại</a>
+    </div>
+</div>
+{% endblock %}

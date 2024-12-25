@@ -1,0 +1,160 @@
+<div class="form-container-1">
+    <h2 class="form-titleee">Thêm học sinh</h2>
+    <form method="POST" class="student-form-1">
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        {% if success %}
+            <div class="alert alert-success-1">{{ success }}</div>
+        {% endif %}
+
+        <div class="form-group-1">
+            <label for="ten_hoc_sinh">Họ tên học sinh:</label>
+            <input type="text" id="ten_hoc_sinh" name="ten_hoc_sinh" required>
+        </div>
+
+        <div class="form-group-1">
+            <label for="gioi_tinh">Giới tính:</label>
+            <select id="gioi_tinh" name="gioi_tinh" required>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+            </select>
+        </div>
+        
+        <div class="form-group-1">
+            <label for="ngay_sinh">Ngày sinh:</label>
+            <input type="date" id="ngay_sinh" name="ngay_sinh" required>
+        </div>
+
+        <div class="form-group-1">
+            <label for="dia_chi">Địa chỉ:</label>
+            <input type="text" id="dia_chi" name="dia_chi" required>
+        </div>
+
+        <div class="form-group-1">
+            <label for="so_dien_thoai">Số điện thoại:</label>
+            <input type="text" id="so_dien_thoai" name="so_dien_thoai" required pattern="\d+" title="Số điện thoại phải chỉ chứa các chữ số">
+        </div>
+
+        <div class="form-group-1">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="button-group-1">
+            <button type="submit" class="submit-btn">Thêm học sinh</button>
+            <a href="{{ url_for('danhsach_lop') }}" class="back-btn">Trở về</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-container-1 {
+        max-width: 700px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .form-titleee {
+        text-align: center;
+        font-size: 26px;
+        margin-bottom: 30px;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .alert-success-1 {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .form-group-1 {
+        margin-bottom: 25px;
+    }
+
+    .form-group-1 label {
+        font-size: 16px;
+        color: #333;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-group-1 input,
+    .form-group-1 select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        color: #333;
+        background-color: #f9f9f9;
+    }
+
+    .form-group-1 input:focus,
+    .form-group-1 select:focus {
+        border-color: #66afe9;
+        outline: none;
+        background-color: #fff;
+    }
+
+    .button-group-1 {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .submit-btn,
+    .back-btn {
+        padding: 15px 25px;
+        font-size: 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .submit-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+
+    .submit-btn:hover {
+        background-color: #218838;
+    }
+
+    .back-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .back-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .form-container-1 {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>

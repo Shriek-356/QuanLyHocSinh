@@ -81,7 +81,6 @@ def tinh_so_hs_diem_TB_lon_hon_5(monhocid=None, hockyid=None, namhocid=None):
 
 
 def laydanhsachhocsinh():
-
     q = db.session.query(
         Lop.TenLop,
         HocSinh.HoTen
@@ -93,8 +92,10 @@ def laydanhsachhocsinh():
 
     return q
 
+
 def laymonhoc(monhocid=None):
     return db.session.query(MonHoc.MaMonHoc,MonHoc.TenMonHoc).filter(MonHoc.MaMonHoc==monhocid).all()
+
 
 def laythongtinnhanvien(MaTaiKhoan, VaiTro):
 
@@ -102,6 +103,7 @@ def laythongtinnhanvien(MaTaiKhoan, VaiTro):
         return NhanVienTruong.query.filter(MaTaiKhoan==NhanVienTruong.MaTaiKhoan).first()
     elif VaiTro==VaiTro.TEACHER:
         return GiaoVien.query.filter(MaTaiKhoan==GiaoVien.MaTaiKhoan).first()
+
 
 
 def laylopcuagiaovien(MaNhanVien):
@@ -254,3 +256,42 @@ def dem_hocsinh_tutrungbinh_theolop(ma_nam_hoc, ma_hoc_ky, ma_mon_hoc):
 
     return result
 
+def laydanhsachhocsinh(search_name=''):
+    query = db.session.query(
+        HocSinh.HoTen,
+        HocSinh.GioiTinh,
+        HocSinh.NgaySinh,
+        HocSinh.DiaChi,
+        HocSinh.SoDienThoai,
+        HocSinh.Email
+    ).filter(HocSinh.HoTen.like(f'%{search_name}%'))
+
+    return query.all()
+
+
+def laydanhsachlophocsinh(search_name='', filter_class=''):
+    # Truy vấn danh sách lớp và học sinh, bao gồm các trường cần thiết
+    query = db.session.query(
+        Lop.TenLop,
+        HocSinh.HoTen,
+        HocSinh.GioiTinh,
+        HocSinh.NgaySinh,
+        HocSinh.DiaChi,
+        HocSinh.SoDienThoai,
+        HocSinh.Email
+    ).join(
+        ChiTietLopHS, Lop.MaLop == ChiTietLopHS.c.MaLop
+    ).join(
+        HocSinh, HocSinh.MaHocSinh == ChiTietLopHS.c.MaHocSinh
+    )
+
+    # Lọc theo tên học sinh nếu có
+    if search_name:
+        query = query.filter(HocSinh.HoTen.like(f'%{search_name}%'))
+
+    # Lọc theo lớp nếu có
+    if filter_class:
+        query = query.filter(Lop.MaLop == filter_class)
+
+    # Trả về kết quả truy vấn
+    return query.all()

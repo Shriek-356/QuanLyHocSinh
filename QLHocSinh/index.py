@@ -246,19 +246,7 @@ def nhapdiem():
                 db.session.commit()
                 # Sau khi cập nhật, chuyển hướng về lại trang nhập điểm
                 # Cập nhật điểm cho học sinh
-                for hocsinh in danhsachhocsinh:
-                    diem15p = Diem15p.query.filter_by(MaHocSinh=hocsinh.MaHocSinh, MaHocKy=hockydachon,
-                                                      MaMonHoc=mondachon,
-                                                      MaNamHoc=namdachon).all()
-                    hocsinh.diem15p_list = diem15p
 
-                    diem1tiet = Diem1Tiet.query.filter_by(MaHocSinh=hocsinh.MaHocSinh, MaHocKy=hockydachon,
-                                                          MaMonHoc=mondachon, MaNamHoc=namdachon).all()
-                    hocsinh.diem1tiet_list = diem1tiet
-
-                    diemhocky = DiemHocKy.query.filter_by(MaHocSinh=hocsinh.MaHocSinh, MaHocKy=hockydachon,
-                                                          MaMonHoc=mondachon, MaNamHoc=namdachon).all()
-                    hocsinh.diemhocky_list = diemhocky
 
     page = request.args.get('page', 1, type=int)
     page_size = app.config['PAGE_SIZE']
@@ -384,6 +372,161 @@ def xuatdiemtb():
                            hockys=hockys,
                            pages=math.ceil(counter / app.config['PAGE_SIZE'])
                            )
+
+
+
+@app.route('/danhsach_lop', methods=['GET', 'POST'])
+def danhsach_lop():
+    search_name = request.args.get('search_name', '')
+    danhsach_lop_hocsinh = utils.laydanhsachhocsinh(search_name)
+
+    userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
+
+    return render_template('danhsach.html',
+                           danhsach_lop_hocsinh=danhsach_lop_hocsinh,
+                           userif=userif,
+                           VaiTro=VaiTro,
+                           search_name=search_name)
+
+
+@app.route('/them_hocsinh', methods=['GET', 'POST'])
+def them_hocsinh():
+    if request.method == 'POST':
+        ten_hoc_sinh = request.form['ten_hoc_sinh']
+        gioi_tinh = request.form['gioi_tinh']
+        ngay_sinh = request.form['ngay_sinh']
+        dia_chi = request.form['dia_chi']
+        so_dien_thoai = request.form['so_dien_thoai']
+        email = request.form['email']
+
+        #Kiểm tra ngày sinh hợp lệ
+        try:
+            ngay_sinh_date = datetime.strptime(ngay_sinh, '%Y-%m-%d')
+            today = datetime.today()
+            tuoi = (today - ngay_sinh_date).days // 365
+
+            if tuoi < 15 or tuoi > 20:
+                return render_template('them.html', error="Tuổi của học sinh phải từ 15 đến 20 tuổi!!!")
+
+        except ValueError:
+            return render_template('them.html', error="Ngày sinh không hợp lệ!")
+
+        #Kiểm tra trùng số điện thoại hoặc email
+        if HocSinh.query.filter_by(SoDienThoai=so_dien_thoai).first():
+            return render_template('them.html', error="Số điện thoại đã tồn tại!")
+
+        if HocSinh.query.filter_by(Email=email).first():
+            return render_template('them.html', error="Email đã tồn tại!")
+
+        try:
+            new_hoc_sinh = HocSinh(
+                HoTen=ten_hoc_sinh,
+                GioiTinh=gioi_tinh,
+                NgaySinh=ngay_sinh,
+                DiaChi=dia_chi,
+                SoDienThoai=so_dien_thoai,
+                Email=email
+            )
+            db.session.add(new_hoc_sinh)
+            db.session.commit()
+
+            return render_template('them.html', success="Thêm học sinh thành công!")
+        except Exception as e:
+            db.session.rollback()
+            return render_template('them.html', error=f"Lỗi: {str(e)}")
+
+    return render_template('them.html')
+
+
+@app.route('/hienthi_danhsach_lop_hocsinh', methods=['GET', 'POST'])
+def hienthi_danhsach_lop_hocsinh():
+    # Lấy giá trị từ URL query parameters
+    search_name = request.args.get('search_name', '')
+    filter_class = request.args.get('filter_class', '')
+
+    # Truy vấn danh sách lớp học
+    classes = db.session.query(Lop).all()
+
+    # Truy vấn danh sách học sinh với tham số lọc và tìm kiếm
+    danhsach_lop_hocsinh = utils.laydanhsachlophocsinh(search_name, filter_class)
+
+    # Lấy thông tin người dùng hiện tại
+    userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
+
+    return render_template('danhsachlop.html',
+                           danhsach_lop_hocsinh=danhsach_lop_hocsinh,
+                           userif=userif,
+                           VaiTro=VaiTro,
+                           classes=classes,
+                           search_name=search_name,  # Truyền giá trị search_name vào template
+                           filter_class=filter_class)  # Truyền giá trị filter_class vào template
+
+
+
+
+@app.route('/lap_lop', methods=['GET', 'POST'])
+def lap_lop():
+    # Truy vấn danh sách lớp
+    danh_sach_lop = db.session.query(Lop.MaLop, Lop.TenLop).all()
+
+    # Truy vấn danh sách học sinh chưa có trong bảng ChiTietLopHS
+    subquery = db.session.query(ChiTietLopHS.c.MaHocSinh)  # Truy vấn cột MaHocSinh trong bảng ChiTietLopHS
+    hoc_sinh_chua_xep_lop = db.session.query(
+        HocSinh.MaHocSinh,
+        HocSinh.HoTen,
+        HocSinh.NgaySinh,
+        HocSinh.GioiTinh,
+        HocSinh.Email,
+        HocSinh.DiaChi
+    ).filter(~HocSinh.MaHocSinh.in_(subquery)).all()
+
+    if request.method == 'POST':
+        # Lấy giá trị lớp được chọn và danh sách học sinh từ form
+        ma_lop = request.form.get('ma_lop')
+        hoc_sinh_chon = request.form.getlist('hoc_sinh_da_chon')  # Lấy danh sách các học sinh đã chọn
+
+        if ma_lop and hoc_sinh_chon:
+            try:
+                # Kiểm tra số lượng học sinh trong lớp hiện tại
+                so_luong_hoc_sinh = db.session.query(ChiTietLopHS).filter(ChiTietLopHS.c.MaLop == ma_lop).count()
+
+                if so_luong_hoc_sinh + len(hoc_sinh_chon) > 40:
+                    # Nếu số học sinh trong lớp + học sinh mới vượt quá 40
+                    flash("Lớp đã đầy (tối đa 40 học sinh).", "danger")
+                    return redirect(url_for('lap_lop'))
+
+                # Thêm học sinh vào lớp
+                for ma_hoc_sinh in hoc_sinh_chon:
+                    # Thêm bản ghi vào bảng ChiTietLopHS
+                    db.session.execute(
+                        ChiTietLopHS.insert().values(
+                            MaHocSinh=ma_hoc_sinh,
+                            MaLop=ma_lop,
+                            MaNamHoc=1  # Giả sử MaNamHoc là 1, có thể thay đổi theo năm học
+                        )
+                    )
+
+                # Commit thay đổi vào cơ sở dữ liệu
+                db.session.commit()
+
+                # Thông báo thành công và tải lại trang
+                flash("Thêm học sinh vào lớp thành công!", "success")
+                return redirect(url_for('lap_lop'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Lỗi: {str(e)}", "danger")
+                return redirect(url_for('lap_lop'))
+
+        else:
+            flash("Vui lòng chọn học sinh!", "warning")
+            return redirect(url_for('lap_lop'))
+
+    return render_template(
+        'laplop.html',
+        hoc_sinh_chua_xep_lop=hoc_sinh_chua_xep_lop,
+        danh_sach_lop=danh_sach_lop
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

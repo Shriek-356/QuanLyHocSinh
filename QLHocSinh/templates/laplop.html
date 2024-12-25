@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xếp Lớp Học Sinh</title>
+</head>
+<body>
+
+<h1>Xếp Lớp Học Sinh</h1>
+
+<div class="form-container">
+    <form method="POST" action="/lap_lop">
+        <!-- Hiển thị các thông báo -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="alert alert-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Chọn lớp -->
+        <label for="chonLop">Chọn lớp:</label>
+        <select id="chonLop" name="ma_lop">
+            {% for lop in danh_sach_lop %}
+                <option value="{{ lop.MaLop }}">{{ lop.TenLop }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Bảng học sinh -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Số thứ tự</th>
+                    <th>Họ tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th>Chọn</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hoc_sinh in hoc_sinh_chua_xep_lop %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ hoc_sinh.HoTen }}</td>
+                        <td>{{ hoc_sinh.NgaySinh }}</td>
+                        <td>{{ 'Nam' if hoc_sinh.GioiTinh else 'Nữ' }}</td>
+                        <td>{{ hoc_sinh.Email }}</td>
+                        <td>{{ hoc_sinh.DiaChi }}</td>
+                        <td>
+                            <input type="checkbox" name="hoc_sinh_da_chon" value="{{ hoc_sinh.MaHocSinh }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Chỉnh giữa nút -->
+        <div class="button-container">
+            <!-- Nút xếp vào lớp -->
+            <button type="submit">Xếp vào lớp</button>
+
+            <!-- Nút trở về -->
+            <a href="/hienthi_danhsach_lop_hocsinh">
+                <button type="button" style="background-color: #6c757d;">Trở về</button>
+            </a>
+        </div>
+    </form>
+</div>
+
+</body>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        color: #333;
+    }
+
+    .form-container {
+        width: 70%;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Các alert thông báo */
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+
+    label {
+        font-size: 16px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f1f1f1;
+    }
+
+    input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px 10px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .form-container > * {
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        max
