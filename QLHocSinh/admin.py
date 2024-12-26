@@ -1,14 +1,19 @@
 from ensurepip import bootstrap
 from pstats import Stats
+from urllib import request
+
 from QLHocSinh import *
 from flask_admin import Admin
-from QLHocSinh.models import MonHoc, VaiTro, CauHinhLopHoc
+from QLHocSinh.models import MonHoc, VaiTro, CauHinhLopHoc, NamHoc, Lop
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, logout_user
 from flask_admin import BaseView,expose,AdminIndexView
-from flask import redirect, url_for, flash
+from flask import redirect, url_for, flash, jsonify
 import utils
 from QLHocSinh import db
+from flask import request
+
+from QLHocSinh.utils import layhockys
 
 
 class AuthenticatedModelView(ModelView):
@@ -49,13 +54,58 @@ class MyAdminIndexView(AdminIndexView):
         return self.render('admin/index.html', VaiTro=VaiTro)
 
 
+from flask import session
+
+from flask import session, request, jsonify, redirect, url_for
+
 class StatsView(BaseView):
-    @expose('/')
+    @expose('/',methods=["GET","POST"])
     def index(self):
-        return self.render('admin/stats.html', stats=utils.dem_hocsinh_tutrungbinh_theolop(1,2,2))
+        # Lấy danh sách các năm học và môn học
+        ds_nam_hoc = db.session.query(NamHoc).all()
+        ds_mon = db.session.query(MonHoc).all()
+
+        hockys=[]
+
+        # Lấy các tham số từ session (nếu có)
+        selected_year = session.get('selected_year')
+        selected_subject = session.get('selected_subject')
+        selected_hocky = session.get('selected_hocky')
+
+        if request.method == 'POST':
+            if 'filter_hocky' in request.form:
+                selected_year = request.form['nam_hoc']
+                session['selected_year'] = selected_year
+
+                selected_subject = request.form['mon']
+                session['selected_subject'] = selected_subject
+
+                hockys = layhockys(selected_year)
+
+            if 'thongke' in request.form:
+
+                selected_hocky = request.form['hocky']
+                session['selected_hocky'] = selected_hocky
+
+        stats = None
+        if selected_year and selected_subject and selected_hocky:
+            stats = utils.dem_hocsinh_tutrungbinh_theolop(selected_year, selected_hocky, selected_subject)
+
+        # Trả về template với các tham số
+        return self.render('admin/stats.html',
+                           stats=stats,
+                           years=ds_nam_hoc,
+                           subjects=ds_mon,
+                           hockys=hockys,
+                           selected_year=selected_year,
+                           selected_subject=selected_subject,
+                           selected_hocky=selected_hocky)
+
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.LoaiTaiKhoan.__eq__(VaiTro.ADMIN)
+
+
 
 
 class Regulations(AuthenticatedModelView):

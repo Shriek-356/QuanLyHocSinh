@@ -24,38 +24,45 @@ Danh sách Lớp và Học sinh
 
         <form method="GET" action="{{ url_for('danhsach_lop') }}" onsubmit="return validateSearchForm()">
             <label for="search_name">Tìm kiếm học sinh theo tên:</label>
-            <input type="text" id="search_name" name="search_name" value="{{ search_name }}" required title="Vui lòng điền thông tin tìm kiếm">
+            <input type="text" id="search_name" name="search_name" value="{{ search_name }}" required
+                   title="Vui lòng điền thông tin tìm kiếm">
 
             <button type="submit">Tìm kiếm</button>
         </form>
 
-        <h2>Danh sách học sinh</h2>
+        <h2>Danh sách học sinh chưa có lớp học</h2>
 
         <table border="1">
             <thead>
-                <tr>
-                    <th>Số thứ tự</th>
-                    <th>Họ Tên Học Sinh</th>
-                    <th>Giới Tính</th>
-                    <th>Ngày Sinh</th>
-                    <th>Địa Chỉ</th>
-                    <th>Số Điện Thoại</th>
-                    <th>Email</th>
-                </tr>
+            <tr>
+                <th>Số thứ tự</th>
+                <th>Họ Tên Học Sinh</th>
+                <th>Giới Tính</th>
+                <th>Ngày Sinh</th>
+                <th>Địa Chỉ</th>
+                <th>Số Điện Thoại</th>
+                <th>Email</th>
+            </tr>
             </thead>
             <tbody>
-                {% for hoc_sinh, gioi_tinh, ngay_sinh, dia_chi, so_dien_thoai, email in danhsach_lop_hocsinh %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ hoc_sinh }}</td>
-                    <td>{{ gioi_tinh }}</td>
-                    <td>{{ ngay_sinh }}</td>
-                    <td>{{ dia_chi }}</td>
-                    <td>{{ so_dien_thoai }}</td>
-                    <td>{{ email }}</td>
-                </tr>
-                {% endfor %}
+            {% for hoc_sinh in danhsach_lop_hocsinh %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ hoc_sinh.HoTen }}</td>
+                <td>{{ hoc_sinh.GioiTinh }}</td>
+                <td>{{ hoc_sinh.NgaySinh }}</td>
+                <td>{{ hoc_sinh.DiaChi }}</td>
+                <td>{{ hoc_sinh.SoDienThoai }}</td>
+                <td>{{ hoc_sinh.Email }}</td>
+                <td>
+                    <!-- Thêm liên kết xóa học sinh -->
+                    <a href="{{ url_for('xoa_hocsinh', hoc_sinh_id=hoc_sinh.MaHocSinh) }}"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa học sinh này?');">Xóa</a>
+                </td>
+            </tr>
+            {% endfor %}
             </tbody>
+
         </table>
 
         <a href="{{ url_for('home') }}">Quay lại</a>

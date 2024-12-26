@@ -6,11 +6,18 @@ from QLHocSinh import db
 
 
 
-def check_login(username, password):
-    query = TaiKhoan.query.filter(
+def check_login(username, password, role = None):
+    if role:
+      query = TaiKhoan.query.filter(
         TaiKhoan.TenDangNhap == username.strip(),
-        TaiKhoan.MatKhau == password
-    )
+        TaiKhoan.MatKhau == password,
+        TaiKhoan.LoaiTaiKhoan == role
+      )
+    else:
+        query = TaiKhoan.query.filter(
+            TaiKhoan.TenDangNhap == username.strip(),
+            TaiKhoan.MatKhau == password,
+        )
     return query.first()
 
 def get_user_by_id(user_id):

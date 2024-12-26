@@ -17,9 +17,11 @@ def welcome():
 
 @app.route('/home')
 def home():
-    userif = laythongtinnhanvien(current_user.MaTaiKhoan,current_user.LoaiTaiKhoan)
-
-    return render_template('home.html',VaiTro=VaiTro,userif=userif)
+    if current_user.is_authenticated:
+       userif = laythongtinnhanvien(current_user.MaTaiKhoan,current_user.LoaiTaiKhoan)
+       return render_template('home.html',VaiTro=VaiTro,userif=userif)
+    else:
+        return redirect(url_for('login'))
 
 @login.user_loader
 def user_load(userid):
@@ -39,7 +41,7 @@ def login():
             else:
                 return redirect(url_for('admin.index'))
         else:
-            msg="Tai khoan hoac mat khau khong dung"
+            msg="Tài khoản hoặc mật khẩu không đúng"
 
     return render_template('login.html', msg=msg)
 
@@ -52,11 +54,13 @@ def signout():
 def login_admin():
     username = request.form['username']
     password = request.form['password']
-    user = utils.check_login(username, password , role=VaiTro.ADMIN)
+    user = utils.check_login(username, password, role= VaiTro.ADMIN)
     if user:
         login_user(user)
         return redirect(url_for('admin.index'))
-
+    else:
+        flash('Tên đăng nhập hoặc mật khẩu không đúng!', 'error')
+        return redirect(url_for('admin.index'))
 
 @app.route('/nhapdiem', methods=["GET", "POST"])
 def nhapdiem():
@@ -378,8 +382,15 @@ def xuatdiemtb():
 @app.route('/danhsach_lop', methods=['GET', 'POST'])
 def danhsach_lop():
     search_name = request.args.get('search_name', '')
-    danhsach_lop_hocsinh = utils.laydanhsachhocsinh(search_name)
 
+    # Truy vấn các học sinh chưa có trong bảng ChiTietLopHS
+    danhsach_lop_hocsinh = HocSinh.query.outerjoin(ChiTietLopHS).filter(ChiTietLopHS.c.MaHocSinh == None)
+
+    # Nếu có tên tìm kiếm, lọc theo tên học sinh
+    if search_name:
+        danhsach_lop_hocsinh = danhsach_lop_hocsinh.filter(HocSinh.HoTen.ilike(f"%{search_name}%"))
+
+    # Lấy thông tin người dùng
     userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
 
     return render_template('danhsach.html',
@@ -387,6 +398,19 @@ def danhsach_lop():
                            userif=userif,
                            VaiTro=VaiTro,
                            search_name=search_name)
+
+
+@app.route('/xoa_hocsinh/<int:hoc_sinh_id>', methods=['GET', 'POST'])
+def xoa_hocsinh(hoc_sinh_id):
+    # Tìm học sinh theo MaHocSinh
+    hoc_sinh = HocSinh.query.get_or_404(hoc_sinh_id)
+
+    # Xóa học sinh khỏi cơ sở dữ liệu
+    db.session.delete(hoc_sinh)
+    db.session.commit()
+
+    # Chuyển hướng về trang danh sách học sinh sau khi xóa
+    return redirect(url_for('danhsach_lop'))
 
 
 @app.route('/them_hocsinh', methods=['GET', 'POST'])
@@ -399,25 +423,37 @@ def them_hocsinh():
         so_dien_thoai = request.form['so_dien_thoai']
         email = request.form['email']
 
-        #Kiểm tra ngày sinh hợp lệ
+        # Kiểm tra ngày sinh hợp lệ
         try:
             ngay_sinh_date = datetime.strptime(ngay_sinh, '%Y-%m-%d')
             today = datetime.today()
             tuoi = (today - ngay_sinh_date).days // 365
-
-            if tuoi < 15 or tuoi > 20:
-                return render_template('them.html', error="Tuổi của học sinh phải từ 15 đến 20 tuổi!!!")
-
         except ValueError:
             return render_template('them.html', error="Ngày sinh không hợp lệ!")
 
-        #Kiểm tra trùng số điện thoại hoặc email
+        # Lấy cấu hình lớp học từ bảng CauHinhLopHoc
+        cau_hinh = CauHinhLopHoc.query.order_by(CauHinhLopHoc.NgayCapNhat.desc()).first()
+        if not cau_hinh:
+            return render_template('them.html', error="Không tìm thấy cấu hình lớp học!")
+
+        tuoi_toi_thieu = cau_hinh.DoTuoiToiThieu
+        tuoi_toi_da = cau_hinh.DoTuoiToiDa
+
+        # Kiểm tra độ tuổi hợp lệ
+        if tuoi < tuoi_toi_thieu or tuoi > tuoi_toi_da:
+            return render_template(
+                'them.html',
+                error=f"Tuổi của học sinh phải nằm trong khoảng {tuoi_toi_thieu} đến {tuoi_toi_da} tuổi!"
+            )
+
+        # Kiểm tra trùng số điện thoại hoặc email
         if HocSinh.query.filter_by(SoDienThoai=so_dien_thoai).first():
             return render_template('them.html', error="Số điện thoại đã tồn tại!")
 
         if HocSinh.query.filter_by(Email=email).first():
             return render_template('them.html', error="Email đã tồn tại!")
 
+        # Thêm học sinh vào cơ sở dữ liệu
         try:
             new_hoc_sinh = HocSinh(
                 HoTen=ten_hoc_sinh,
@@ -437,35 +473,72 @@ def them_hocsinh():
 
     return render_template('them.html')
 
-
 @app.route('/hienthi_danhsach_lop_hocsinh', methods=['GET', 'POST'])
 def hienthi_danhsach_lop_hocsinh():
+    # Lấy danh sách năm học
+    danh_sach_nam_hoc = db.session.query(NamHoc).all()
+
     # Lấy giá trị từ URL query parameters
     search_name = request.args.get('search_name', '')
     filter_class = request.args.get('filter_class', '')
+    filter_year = request.args.get('nam_hoc', '')  # Thêm lọc theo năm học
 
     # Truy vấn danh sách lớp học
     classes = db.session.query(Lop).all()
 
     # Truy vấn danh sách học sinh với tham số lọc và tìm kiếm
-    danhsach_lop_hocsinh = utils.laydanhsachlophocsinh(search_name, filter_class)
+    query = db.session.query(
+        Lop.TenLop.label('lop'),
+        HocSinh.HoTen.label('hoc_sinh'),
+        HocSinh.GioiTinh.label('gioi_tinh'),
+        HocSinh.NgaySinh.label('ngay_sinh'),
+        HocSinh.DiaChi.label('dia_chi'),
+        HocSinh.SoDienThoai.label('so_dien_thoai'),
+        HocSinh.Email.label('email')
+    ).join(
+        ChiTietLopHS, ChiTietLopHS.c.MaHocSinh == HocSinh.MaHocSinh
+    ).join(
+        Lop, ChiTietLopHS.c.MaLop == Lop.MaLop
+    )
+
+    # Áp dụng lọc theo năm học nếu có
+    if filter_year:
+        query = query.filter(ChiTietLopHS.c.MaNamHoc == filter_year)
+
+    # Áp dụng lọc theo lớp nếu có
+    if filter_class:
+        query = query.filter(Lop.MaLop == filter_class)
+
+    # Áp dụng tìm kiếm theo tên học sinh nếu có
+    if search_name:
+        query = query.filter(HocSinh.HoTen.ilike(f"%{search_name}%"))
+
+    print(filter_year)
+    print(filter_class)
+    # Lấy danh sách học sinh sau khi áp dụng các bộ lọc
+    danhsach_lop_hocsinh = query.all()
 
     # Lấy thông tin người dùng hiện tại
     userif = laythongtinnhanvien(current_user.MaTaiKhoan, current_user.LoaiTaiKhoan)
 
-    return render_template('danhsachlop.html',
-                           danhsach_lop_hocsinh=danhsach_lop_hocsinh,
-                           userif=userif,
-                           VaiTro=VaiTro,
-                           classes=classes,
-                           search_name=search_name,  # Truyền giá trị search_name vào template
-                           filter_class=filter_class)  # Truyền giá trị filter_class vào template
-
+    return render_template(
+        'danhsachlop.html',
+        danhsach_lop_hocsinh=danhsach_lop_hocsinh,
+        userif=userif,
+        VaiTro=VaiTro,
+        classes=classes,
+        search_name=search_name,  # Truyền giá trị search_name vào template
+        filter_class=filter_class,
+        filter_year=filter_year,  # Truyền giá trị filter_year vào template
+        danh_sach_nam_hoc=danh_sach_nam_hoc
+    )
 
 
 
 @app.route('/lap_lop', methods=['GET', 'POST'])
 def lap_lop():
+    danh_sach_nam_hoc = db.session.query(NamHoc.MaNamHoc, NamHoc.TenNamHoc).all()
+
     # Truy vấn danh sách lớp
     danh_sach_lop = db.session.query(Lop.MaLop, Lop.TenLop).all()
 
@@ -481,18 +554,30 @@ def lap_lop():
     ).filter(~HocSinh.MaHocSinh.in_(subquery)).all()
 
     if request.method == 'POST':
-        # Lấy giá trị lớp được chọn và danh sách học sinh từ form
+        # Lấy giá trị năm học và lớp được chọn từ form
+        ma_nam_hoc = request.form.get('nam_hoc')
         ma_lop = request.form.get('ma_lop')
         hoc_sinh_chon = request.form.getlist('hoc_sinh_da_chon')  # Lấy danh sách các học sinh đã chọn
 
-        if ma_lop and hoc_sinh_chon:
+        if ma_nam_hoc and ma_lop and hoc_sinh_chon:
             try:
-                # Kiểm tra số lượng học sinh trong lớp hiện tại
-                so_luong_hoc_sinh = db.session.query(ChiTietLopHS).filter(ChiTietLopHS.c.MaLop == ma_lop).count()
+                # Lấy cấu hình sĩ số tối đa từ bảng CauHinhLopHoc
+                cau_hinh = db.session.query(CauHinhLopHoc).first()
+                if not cau_hinh:
+                    flash("Chưa có cấu hình lớp học. Vui lòng cấu hình trước!", "danger")
+                    return redirect(url_for('lap_lop'))
 
-                if so_luong_hoc_sinh + len(hoc_sinh_chon) > 40:
-                    # Nếu số học sinh trong lớp + học sinh mới vượt quá 40
-                    flash("Lớp đã đầy (tối đa 40 học sinh).", "danger")
+                si_so_toi_da = cau_hinh.SiSoToiDa
+
+                # Kiểm tra số lượng học sinh trong lớp hiện tại
+                so_luong_hoc_sinh = db.session.query(ChiTietLopHS).filter(
+                    ChiTietLopHS.c.MaLop == ma_lop,
+                    ChiTietLopHS.c.MaNamHoc == ma_nam_hoc
+                ).count()
+
+                if so_luong_hoc_sinh + len(hoc_sinh_chon) > si_so_toi_da:
+                    # Nếu số học sinh trong lớp + học sinh mới vượt quá sĩ số tối đa
+                    flash(f"Lớp đã đầy (tối đa {si_so_toi_da} học sinh).", "danger")
                     return redirect(url_for('lap_lop'))
 
                 # Thêm học sinh vào lớp
@@ -502,7 +587,7 @@ def lap_lop():
                         ChiTietLopHS.insert().values(
                             MaHocSinh=ma_hoc_sinh,
                             MaLop=ma_lop,
-                            MaNamHoc=1  # Giả sử MaNamHoc là 1, có thể thay đổi theo năm học
+                            MaNamHoc=ma_nam_hoc  # Thêm MaNamHoc được chọn
                         )
                     )
 
@@ -519,13 +604,14 @@ def lap_lop():
                 return redirect(url_for('lap_lop'))
 
         else:
-            flash("Vui lòng chọn học sinh!", "warning")
+            flash("Vui lòng chọn năm học, lớp và học sinh!", "warning")
             return redirect(url_for('lap_lop'))
 
     return render_template(
         'laplop.html',
         hoc_sinh_chua_xep_lop=hoc_sinh_chua_xep_lop,
-        danh_sach_lop=danh_sach_lop
+        danh_sach_lop=danh_sach_lop,
+        danh_sach_nam_hoc=danh_sach_nam_hoc
     )
 
 if __name__ == '__main__':

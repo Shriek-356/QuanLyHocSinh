@@ -1,107 +1,128 @@
 {% extends 'admin/base.html' %}
 
 {% block body %}
- <style>
-        /* Toàn bộ trang */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Tiêu đề của trang */
-        h1 {
+    <style>
+        /* Các style cho form lọc */
+        .filter-form {
             text-align: center;
-            margin-top: 20px;
-            color: #333;
+            margin: 20px 0;
         }
 
-        /* Bảng */
+        .filter-form select {
+            padding: 8px;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+
+        .filter-form button {
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style cho bảng dữ liệu */
         table {
-            width: 80%;
+            width: 100%;
             margin: 20px auto;
             border-collapse: collapse;
             background-color: #ffffff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Định dạng cho các tiêu đề cột */
-        th {
-            background-color: #007BFF;
-            color: white;
+        th, td {
             padding: 12px;
             text-align: center;
-            font-size: 16px;
+            border: 1px solid #ddd;
         }
 
-        /* Định dạng cho các ô trong bảng */
-        td {
-            padding: 10px;
-            text-align: center;
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Style cho các nút */
+        .filter-form button {
+            padding: 10px 20px;
             font-size: 14px;
-            border-bottom: 1px solid #ddd;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
         }
 
-        /* Định dạng cho các dòng khi hover */
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Cột Tỷ lệ (%) */
-        .percentage {
-            color: #007BFF;
-            font-weight: bold;
-        }
-
-        /* Cột Số học sinh đạt >= 5 */
-        .achieved {
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        /* Cột Tổng số học sinh */
-        .total {
-            color: #dc3545;
-            font-weight: bold;
-        }
-
-        /* Định dạng khi bảng không có dữ liệu */
-        .no-data {
-            text-align: center;
-            color: #888;
-            font-size: 18px;
-            margin-top: 20px;
+        .filter-form button:hover {
+            background-color: #0056b3;
         }
     </style>
-<h1 class="text-center text-danger">Báo cáo tổng kết môn học</h1>
 
-<div class = "col-md-5 col-xs-12">
+    <h1 class="text-center text-danger">Báo cáo tổng kết môn học</h1>
 
-     <table border="1" style=" width: 100%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-        <thead>
-            <tr>
-                <th>Lớp</th>
-                <th>Tổng số học sinh</th>  <!-- Cột mới -->
-                <th>Số học sinh đạt >= 5</th>
-                <th>Tỷ lệ (%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lop, data in stats.items() %}
+    <!-- Form lọc cho năm học và môn học -->
+    <div class="filter-form">
+        <!-- Form chọn năm học và môn học -->
+        <form method="POST" action="{{ url_for('statsview.index') }}">
+            <select name="nam_hoc" id="nam_hoc" onchange="loadHocKy()">
+                <option value="">Chọn năm học</option>
+                {% for year in years %}
+                    <option value="{{ year.MaNamHoc }}" {% if year.MaNamHoc|string == selected_year|string %}selected{% endif %}>{{ year.TenNamHoc }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="mon" id="mon">
+                <option value="">Chọn Môn Học</option>
+                {% for mon in subjects %}
+                    <option value="{{ mon.MaMonHoc }}" {% if mon.MaMonHoc|string == selected_subject|string %}selected{% endif %}>{{ mon.TenMonHoc }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" name="filter_hocky">Lọc Học Kỳ</button>
+        </form>
+
+        <!-- Form chọn học kỳ và tính thống kê -->
+        <form method="POST" action="{{ url_for('statsview.index') }}">
+            <select name="hocky" id="hocky">
+                <option value="">Chọn học kỳ</option>
+                {% for hocky in hockys %}
+                    <option value="{{ hocky.MaHocKy }}" {% if hocky.MaHocKy|string == selected_hocky|string %}selected{% endif %}>{{ hocky.TenHocKy }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" name="thongke">Lọc và Tính Thống Kê</button>
+        </form>
+    </div>
+
+    <div class="col-md-5 col-xs-12">
+        <table border="1">
+            <thead>
                 <tr>
-                    <td>{{ lop }}</td>
-                    <td>{{ data['tong_hocsinh'] }}</td>  <!-- Hiển thị tổng số học sinh -->
-                    <td>{{ data['so_hocsinh_dat'] }}</td>
-                    <td>{{ data['ty_le'] }}%</td>
+                    <th>Lớp</th>
+                    <th>Tổng số học sinh</th>  <!-- Cột mới -->
+                    <th>Số học sinh đạt >= 5</th>
+                    <th>Tỷ lệ (%)</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for lop, data in stats.items() %}
+                    <tr>
+                        <td>{{ lop }}</td>
+                        <td>{{ data['tong_hocsinh'] }}</td>  <!-- Hiển thị tổng số học sinh -->
+                        <td>{{ data['so_hocsinh_dat'] }}</td>
+                        <td>{{ data['ty_le'] }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-</div>
 {% endblock %}

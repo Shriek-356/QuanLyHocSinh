@@ -13,50 +13,60 @@
     <form method="POST" action="/lap_lop">
         <!-- Hiển thị các thông báo -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul>
-                    {% for category, message in messages %}
-                        <li class="alert alert-{{ category }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+            <li class="alert alert-{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         {% endwith %}
+
+        <!-- Chọn năm học -->
+        <label for="chonNamHoc">Chọn năm học:</label>
+        <select id="chonNamHoc" name="nam_hoc">
+            <option value="">Chọn năm học</option>
+            {% for nam in danh_sach_nam_hoc %}
+            <option value="{{ nam.MaNamHoc }}">{{ nam.TenNamHoc }}</option>
+            {% endfor %}
+        </select>
 
         <!-- Chọn lớp -->
         <label for="chonLop">Chọn lớp:</label>
         <select id="chonLop" name="ma_lop">
+            <option value="">Chọn lớp</option>
             {% for lop in danh_sach_lop %}
-                <option value="{{ lop.MaLop }}">{{ lop.TenLop }}</option>
+            <option value="{{ lop.MaLop }}">{{ lop.TenLop }}</option>
             {% endfor %}
         </select>
 
         <!-- Bảng học sinh -->
         <table>
             <thead>
-                <tr>
-                    <th>Số thứ tự</th>
-                    <th>Họ tên</th>
-                    <th>Ngày sinh</th>
-                    <th>Giới tính</th>
-                    <th>Email</th>
-                    <th>Địa chỉ</th>
-                    <th>Chọn</th>
-                </tr>
+            <tr>
+                <th>Số thứ tự</th>
+                <th>Họ tên</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Email</th>
+                <th>Địa chỉ</th>
+                <th>Chọn</th>
+            </tr>
             </thead>
             <tbody>
-                {% for hoc_sinh in hoc_sinh_chua_xep_lop %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ hoc_sinh.HoTen }}</td>
-                        <td>{{ hoc_sinh.NgaySinh }}</td>
-                        <td>{{ 'Nam' if hoc_sinh.GioiTinh else 'Nữ' }}</td>
-                        <td>{{ hoc_sinh.Email }}</td>
-                        <td>{{ hoc_sinh.DiaChi }}</td>
-                        <td>
-                            <input type="checkbox" name="hoc_sinh_da_chon" value="{{ hoc_sinh.MaHocSinh }}">
-                        </td>
-                    </tr>
-                {% endfor %}
+            {% for hoc_sinh in hoc_sinh_chua_xep_lop %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ hoc_sinh.HoTen }}</td>
+                <td>{{ hoc_sinh.NgaySinh }}</td>
+                <td>{{ 'Nam' if hoc_sinh.GioiTinh else 'Nữ' }}</td>
+                <td>{{ hoc_sinh.Email }}</td>
+                <td>{{ hoc_sinh.DiaChi }}</td>
+                <td>
+                    <input type="checkbox" name="hoc_sinh_da_chon" value="{{ hoc_sinh.MaHocSinh }}">
+                </td>
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
 
@@ -178,6 +188,4 @@
     .form-container > * {
         margin-bottom: 20px;
     }
-
-    .form-container {
-        max
+    </style>

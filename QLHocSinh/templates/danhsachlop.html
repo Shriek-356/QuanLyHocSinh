@@ -29,14 +29,11 @@ Danh sách Lớp và Học sinh
         <form method="GET" action="{{ url_for('hienthi_danhsach_lop_hocsinh') }}">
             <!-- Thanh lọc theo học kỳ nằm trên -->
             <div class="form-group">
-                <label for="filter_hocky">Lọc theo năm học:</label>
-                <select id="filter_hocky" name="filter_hocky">
+                <label for="chonNamHoc">Chọn năm học:</label>
+                <select id="chonNamHoc" name="nam_hoc">
                     <option value="">Chọn năm học</option>
-                    {% for hocky in hockys %}
-                    <option value="{{ hocky.MaHocKy }}"
-                            {% if filter_hocky== hocky.MaHocKy %} selected {% endif %}>
-                        {{ hocky.TenHocKy }}
-                    </option>
+                    {% for nam in danh_sach_nam_hoc %}
+                    <option value="{{ nam.MaNamHoc }}">{{ nam.TenNamHoc }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -103,8 +100,6 @@ Danh sách Lớp và Học sinh
             {% endfor %}
             </tbody>
         </table>
-
-        <a href="{{ url_for('home') }}">Quay lại</a>
     </div>
 </div>
 {% endblock %}
