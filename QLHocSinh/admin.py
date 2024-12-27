@@ -64,7 +64,6 @@ class StatsView(BaseView):
         # Lấy danh sách các năm học và môn học
         ds_nam_hoc = db.session.query(NamHoc).all()
         ds_mon = db.session.query(MonHoc).all()
-
         hockys=[]
 
         # Lấy các tham số từ session (nếu có)
@@ -87,7 +86,7 @@ class StatsView(BaseView):
                 selected_hocky = request.form['hocky']
                 session['selected_hocky'] = selected_hocky
 
-        stats = None
+        stats = utils.dem_hocsinh_tutrungbinh_theolop(1,1,1)
         if selected_year and selected_subject and selected_hocky:
             stats = utils.dem_hocsinh_tutrungbinh_theolop(selected_year, selected_hocky, selected_subject)
 
@@ -104,8 +103,6 @@ class StatsView(BaseView):
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.LoaiTaiKhoan.__eq__(VaiTro.ADMIN)
-
-
 
 
 class Regulations(AuthenticatedModelView):

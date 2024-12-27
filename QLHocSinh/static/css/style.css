@@ -117,7 +117,6 @@ button.login-button:hover {
     margin-left: 300px;
 }
 
-/* Phần lọc lớp và thông tin */
 .filter-class, .filter-sub {
     display: flex;
     justify-content: center;
@@ -126,14 +125,12 @@ button.login-button:hover {
     margin-bottom: 20px;
 }
 
-/* Định dạng cho mỗi div trong filter-class và filter-sub */
 .filter-class div, .filter-sub div {
     display: flex;
-    align-items: center;  /* Căn chỉnh theo chiều ngang */
-    gap: 10px; /* Khoảng cách giữa label và combobox */
+    align-items: center;
+    gap: 10px;
 }
 
-/* Định dạng cho các combobox */
 select {
     padding: 8px 16px;
     font-size: 16px;
@@ -142,7 +139,6 @@ select {
     border: 1px solid #ccc;
 }
 
-/* Nút "Lọc lớp" */
 button {
 
     background-color: #4CAF50;
@@ -155,57 +151,153 @@ button {
     transition: background-color 0.3s ease;
 }
 
-/* Hover effect for buttons */
 button:hover {
     background-color: #45a049;
 }
 
-/* Căn giữa cho nút xác nhận */
 .submit-container {
     text-align: center;
 }
 
-/* Khoảng cách giữa các phần tử */
 button {
     margin-top: 15px;
 }
 
-/* Căn chỉnh khoảng cách cho các combobox */
 button {
     margin-top: 10px;
 }
 
 
-/* Giảm kích thước input */
 input[type="number"] {
     margin-top: 18px;
-    width: 60px; /* Chiều rộng nhỏ hơn */
-    padding: 5px; /* Giảm padding để ô nhập nhỏ hơn */
-    font-size: 14px; /* Font nhỏ lại */
-    text-align: center; /* Căn giữa nội dung trong input */
+    width: 60px;
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
 }
 
-/* Giảm kích thước cho các button */
+
 button[type="submit"] {
-    padding: 5px 15px; /* Giảm padding */
-    font-size: 14px; /* Giảm kích thước font */
-    border-radius: 5px; /* Bo tròn góc */
+    padding: 5px 15px;
+    font-size: 14px;
+    border-radius: 5px;
 }
 
-/* Căn giữa các nút và các ô nhập */
+
 .student-list table {
-    margin: 0 auto; /* Căn giữa bảng */
+    margin: 0 auto;
 }
 
-/* Điều chỉnh kích thước của các thẻ <select> */
+
 select {
-    width: 120px; /* Chiều rộng nhỏ hơn cho các select */
+    width: 120px;
     padding: 5px;
     font-size: 14px;
 }
 
-/* Giảm kích thước cho các thẻ <label> */
 label {
-    font-size: 14px; /* Giảm kích thước font cho label */
+    font-size: 14px;
 }
 
+
+/* Button "Thêm học sinh" */
+.btn-add-student {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add-student:hover {
+    background-color: #27ae60;
+}
+
+/* Button "Quay lại" */
+.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #c0392b;
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #ecf0f1;
+}
+
+tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Button "Xóa" trong bảng */
+table a {
+    color: #e74c3c;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+table a:hover {
+    background-color: #c0392b;
+    color: white;
+}
+
+
+/* Nút "Lập danh sách lớp" */
+.btn-add-class {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-add-class:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.btn-add-class:active {
+    background-color: #1c6fa6;
+    transform: scale(1);
+}
